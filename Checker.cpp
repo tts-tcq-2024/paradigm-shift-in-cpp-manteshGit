@@ -38,7 +38,6 @@ int main() {
   assert(batteryIsOk(-1, 19, 0.79) == false); // Temperature just below minimum, SOC just below minimum, charge rate within range
   assert(batteryIsOk(46, 81, 0.81) == false); // Temperature just above maximum, SOC just above maximum, charge rate just above maximum
   
-  return 0;
-
   cout << "All test cases passed!\n";
+  return 0;
 }
