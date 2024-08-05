@@ -45,17 +45,32 @@ std::map<StatusCode, std::string> createStatusDescriptionMap() {
     return statusDescriptions;
 }
 
-// Function to get SOC status
-StatusCode getSOCStatus(float soc) {
+// Function to check SOC boundaries
+StatusCode checkSOCBounds(float soc) {
     if (soc < SOC_MIN || soc > SOC_MAX) {
         return SOC_OUT_OF_RANGE;
     }
+    return NORMAL;
+}
+
+// Function to check SOC warnings
+StatusCode checkSOCWarnings(float soc) {
     if (soc < SOC_MIN + SOC_WARNING_MIN_TOLERANCE) {
         return LOW_SOC_WARNING;
-    } else if (soc > SOC_MAX - SOC_WARNING_MAX_TOLERANCE) {
+    } 
+    if (soc > SOC_MAX - SOC_WARNING_MAX_TOLERANCE) {
         return HIGH_SOC_WARNING;
     }
     return NORMAL;
+}
+
+// Function to get SOC status
+StatusCode getSOCStatus(float soc) {
+    StatusCode status = checkSOCBounds(soc);
+    if (status != NORMAL) {
+        return status;
+    }
+    return checkSOCWarnings(soc);
 }
 
 // Function to get temperature status
@@ -80,8 +95,8 @@ StatusCode getChargeRateStatus(float chargeRate) {
     return NORMAL;
 }
 
-// Main function to validate system
-StatusCode validateSystem(float soc, float temp, float chargeRate) {
+// Function to get status based on a type
+StatusCode getStatus(float soc, float temp, float chargeRate) {
     StatusCode socStatus = getSOCStatus(soc);
     if (socStatus != NORMAL) return socStatus;
 
@@ -92,6 +107,11 @@ StatusCode validateSystem(float soc, float temp, float chargeRate) {
     if (chargeRateStatus != NORMAL) return chargeRateStatus;
 
     return NORMAL;
+}
+
+// Main function to validate system
+StatusCode validateSystem(float soc, float temp, float chargeRate) {
+    return getStatus(soc, temp, chargeRate);
 }
 
 // Function to check if the battery is OK
