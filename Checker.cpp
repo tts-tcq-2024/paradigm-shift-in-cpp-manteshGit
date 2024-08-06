@@ -95,21 +95,24 @@ StatusCode getChargeRateStatus(float chargeRate) {
     return NORMAL;
 }
 
-// Function to get status based on a type
-StatusCode getStatus(float soc, float temp, float chargeRate) {
-    StatusCode socStatus = getSOCStatus(soc);
-    if (socStatus != NORMAL) return socStatus;
-
-    StatusCode tempStatus = getTemperatureStatus(temp);
-    if (tempStatus != NORMAL) return tempStatus;
-
-    StatusCode chargeRateStatus = getChargeRateStatus(chargeRate);
-    if (chargeRateStatus != NORMAL) return chargeRateStatus;
-
-    return NORMAL;
+// Function to get the highest priority status
+StatusCode getHighestPriorityStatus(StatusCode status1, StatusCode status2) {
+    if (status1 != NORMAL) return status1;
+    return status2;
 }
 
-// Main function to validate system
+// Function to get overall status
+StatusCode getStatus(float soc, float temp, float chargeRate) {
+    StatusCode socStatus = getSOCStatus(soc);
+    StatusCode tempStatus = getTemperatureStatus(temp);
+    StatusCode chargeRateStatus = getChargeRateStatus(chargeRate);
+
+    // Combine the status codes to get the highest priority status
+    StatusCode status = getHighestPriorityStatus(socStatus, tempStatus);
+    return getHighestPriorityStatus(status, chargeRateStatus);
+}
+
+// Function to validate the system
 StatusCode validateSystem(float soc, float temp, float chargeRate) {
     return getStatus(soc, temp, chargeRate);
 }
