@@ -45,7 +45,7 @@ std::map<StatusCode, std::string> createStatusDescriptionMap() {
     return statusDescriptions;
 }
 
-// Function to check SOC boundaries
+// Helper functions for SOC checks
 StatusCode checkSOCBounds(float soc) {
     if (soc < SOC_MIN || soc > SOC_MAX) {
         return SOC_OUT_OF_RANGE;
@@ -53,12 +53,10 @@ StatusCode checkSOCBounds(float soc) {
     return NORMAL;
 }
 
-// Function to check SOC warnings
 StatusCode checkSOCWarnings(float soc) {
     if (soc < SOC_MIN + SOC_WARNING_MIN_TOLERANCE) {
         return LOW_SOC_WARNING;
-    } 
-    if (soc > SOC_MAX - SOC_WARNING_MAX_TOLERANCE) {
+    } else if (soc > SOC_MAX - SOC_WARNING_MAX_TOLERANCE) {
         return HIGH_SOC_WARNING;
     }
     return NORMAL;
@@ -67,59 +65,71 @@ StatusCode checkSOCWarnings(float soc) {
 // Function to get SOC status
 StatusCode getSOCStatus(float soc) {
     StatusCode status = checkSOCBounds(soc);
-    if (status != NORMAL) {
-        return status;
-    }
+    if (status != NORMAL) return status;
     return checkSOCWarnings(soc);
 }
 
-// Function to get temperature status
-StatusCode getTemperatureStatus(float temp) {
+// Helper functions for temperature checks
+StatusCode checkTemperatureBounds(float temp) {
     if (temp > TEMP_MAX) {
         return TEMP_OUT_OF_RANGE;
     }
+    return NORMAL;
+}
+
+StatusCode checkTemperatureWarnings(float temp) {
     if (temp > TEMP_MAX - TEMP_WARNING_TOLERANCE) {
         return TEMP_WARNING;
     }
     return NORMAL;
 }
 
-// Function to get charge rate status
-StatusCode getChargeRateStatus(float chargeRate) {
+// Function to get temperature status
+StatusCode getTemperatureStatus(float temp) {
+    StatusCode status = checkTemperatureBounds(temp);
+    if (status != NORMAL) return status;
+    return checkTemperatureWarnings(temp);
+}
+
+// Helper functions for charge rate checks
+StatusCode checkChargeRateBounds(float chargeRate) {
     if (chargeRate > CHARGE_RATE_MAX) {
         return CHARGE_RATE_OUT_OF_RANGE;
     }
+    return NORMAL;
+}
+
+StatusCode checkChargeRateWarnings(float chargeRate) {
     if (chargeRate > CHARGE_RATE_MAX - CHARGE_RATE_WARNING_TOLERANCE) {
         return CHARGE_RATE_WARNING;
     }
     return NORMAL;
 }
 
-// Function to get the highest priority status
-StatusCode getHighestPriorityStatus(StatusCode status1, StatusCode status2) {
-    if (status1 != NORMAL) return status1;
-    return status2;
+// Function to get charge rate status
+StatusCode getChargeRateStatus(float chargeRate) {
+    StatusCode status = checkChargeRateBounds(chargeRate);
+    if (status != NORMAL) return status;
+    return checkChargeRateWarnings(chargeRate);
 }
 
-// Function to get overall status
+// Function to get the overall status
 StatusCode getStatus(float soc, float temp, float chargeRate) {
     StatusCode socStatus = getSOCStatus(soc);
     StatusCode tempStatus = getTemperatureStatus(temp);
     StatusCode chargeRateStatus = getChargeRateStatus(chargeRate);
 
-    // Combine the status codes to get the highest priority status
-    StatusCode status = getHighestPriorityStatus(socStatus, tempStatus);
-    return getHighestPriorityStatus(status, chargeRateStatus);
-}
+    // Determine the highest priority status directly
+    if (socStatus != NORMAL) return socStatus;
+    if (tempStatus != NORMAL) return tempStatus;
+    if (chargeRateStatus != NORMAL) return chargeRateStatus;
 
-// Function to validate the system
-StatusCode validateSystem(float soc, float temp, float chargeRate) {
-    return getStatus(soc, temp, chargeRate);
+    return NORMAL;
 }
 
 // Function to check if the battery is OK
 bool batteryIsOk(float soc, float temp, float chargeRate) {
-    return validateSystem(soc, temp, chargeRate) == NORMAL;
+    return getStatus(soc, temp, chargeRate) == NORMAL;
 }
 
 // Function to get a descriptive string for StatusCode
@@ -129,50 +139,56 @@ std::string statusCodeToString(StatusCode status) {
 }
 
 int main() {
+    StatusCode status;  // Single StatusCode variable
+
     // Helper function to print status descriptions
-    auto printStatus = [](float soc, float temp, float chargeRate) {
-        StatusCode status = validateSystem(soc, temp, chargeRate);
+    auto printStatus = [&](float soc, float temp, float chargeRate) {
+        status = getStatus(soc, temp, chargeRate);
         std::cout << "SOC: " << soc << ", Temp: " << temp << ", Charge Rate: " << chargeRate
                   << " -> Status: " << statusCodeToString(status) << std::endl;
         return status;
     };
 
     // Test cases with expected results
-    StatusCode status1 = printStatus(25, 40, 0.7);
+    status = printStatus(25, 40, 0.7);
     assert(batteryIsOk(25, 40, 0.7) == true); // SOC and charge rate within range, temperature within range
 
-    StatusCode status2 = printStatus(50, 85, 0);
+    status = printStatus(50, 85, 0);
     assert(batteryIsOk(50, 85, 0) == false); // Temperature out of range
 
     // Additional test cases
-    StatusCode status3 = printStatus(22, 30, 0.5);   // Temperature within range, SOC within range, charge rate within range
+    status = printStatus(22, 30, 0.5);   // Temperature within range, SOC within range, charge rate within range
     assert(batteryIsOk(22, 30, 0.5) == true);
 
-    StatusCode status4 = printStatus(0, 20, 0.9);    // Temperature out of range, SOC within range, charge rate out of range
+    status = printStatus(0, 20, 0.9);    // Temperature out of range, SOC within range, charge rate out of range
     assert(batteryIsOk(0, 20, 0.9) == false);
 
-    StatusCode status6 = printStatus(35, 75, 0.85);  // Temperature within range, SOC within range, charge rate out of range
+    status = printStatus(35, 75, 0.85);  // Temperature within range, SOC within range, charge rate out of range
     assert(batteryIsOk(35, 75, 0.85) == false);
 
     // Testing edge cases
-    StatusCode status7 = printStatus(20, 45, 0.8);    // Minimum SOC, maximum temperature within range, maximum charge rate within range
+    status = printStatus(20, 45, 0.8);    // Minimum SOC, maximum temperature within range, maximum charge rate within range
     assert(batteryIsOk(20, 45, 0.8) == false);      // SOC just at threshold, temperature just at threshold, charge rate within range
 
-    StatusCode status8 = printStatus(80, 45, 0.8);    // Maximum SOC, maximum temperature within range, maximum charge rate within range
+    status = printStatus(80, 45, 0.8);    // Maximum SOC, maximum temperature within range, maximum charge rate within range
     assert(batteryIsOk(80, 45, 0.8) == false);      // SOC just at threshold, temperature within range, charge rate within range
 
-    StatusCode status9 = printStatus(19, 30, 0.79);   // SOC just below minimum, temperature within range, charge rate within range
+    status = printStatus(19, 30, 0.79);   // SOC just below minimum, temperature within range, charge rate within range
     assert(batteryIsOk(19, 30, 0.79) == false);     // SOC below threshold
 
-    StatusCode status10 = printStatus(21, 46, 0.81);  // SOC just above minimum, temperature just above maximum, charge rate just above maximum
+    status = printStatus(21, 46, 0.81);  // SOC just above minimum, temperature just above maximum, charge rate just above maximum
     assert(batteryIsOk(21, 46, 0.81) == false);     // SOC just above threshold, temperature out of range, charge rate out of range
 
     // Test cases with different combinations of tolerance thresholds
-    StatusCode status11 = printStatus(25, 42, 0.76);  // SOC and charge rate within range, temperature within warning tolerance
+    status = printStatus(25, 42, 0.76);  // SOC and charge rate within range, temperature within warning tolerance
     assert(batteryIsOk(25, 42, 0.76) == true);      // SOC and charge rate within range, temperature within warning tolerance
 
-    StatusCode status12 = printStatus(24.5, 44, 0.77); // SOC within warning tolerance, temperature within range, charge rate within range
+    status = printStatus(24.5, 44, 0.77); // SOC within warning tolerance, temperature within range, charge rate within range
     assert(batteryIsOk(24.5, 44, 0.77) == false);    // SOC within warning tolerance, temperature within range, charge rate within range
+
+    // New test case for SOC_OUT_OF_RANGE
+    status = printStatus(15, 30, 0.7);    // SOC below minimum, temperature and charge rate within range
+    assert(batteryIsOk(15, 30, 0.7) == false);      // SOC out of range
 
     std::cout << "All test cases passed!" << std::endl;
     return 0;
