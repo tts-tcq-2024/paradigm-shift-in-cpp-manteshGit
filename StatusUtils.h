@@ -3,7 +3,7 @@
 
 #include "StatusCodes.h"
 #include <string>
-#include <map>
+#include <vector>
 
 enum class Language {
     ENGLISH,
@@ -12,8 +12,8 @@ enum class Language {
 
 class StatusUtils {
 public:
-    static std::string statusCodeToString(StatusCode status);
-    static void printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus);
+    static std::string statusCodeToString(StatusCode status, Language lang = Language::ENGLISH);
+    static void printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus, Language lang = Language::ENGLISH);
 
     static void setLanguage(Language lang) {
         currentLanguage = lang;
@@ -21,7 +21,7 @@ public:
 
 private:
     static Language currentLanguage;
-    static const std::map<StatusCode, std::string>& getStatusDescriptions(Language lang = Language::ENGLISH);
+    static const std::vector<std::vector<std::string>>& getStatusDescriptions();
 };
 
 #endif // STATUSUTILS_H
