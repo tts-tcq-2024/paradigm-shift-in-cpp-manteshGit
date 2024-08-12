@@ -1,6 +1,9 @@
 #include "StatusUtils.h"
 #include <iostream>
 
+// Initialize the default language
+Language StatusUtils::currentLanguage = Language::ENGLISH;
+
 const std::map<StatusCode, std::string> englishStatusDescriptions = {
     {NORMAL, "NORMAL"},
     {LOW_SOC_BREACH, "LOW_SOC_BREACH"},
@@ -27,15 +30,21 @@ const std::map<StatusCode, std::string> germanStatusDescriptions = {
     {CHARGE_RATE_OUT_OF_RANGE, "LADRATEN AUF DEM BEREICH"}
 };
 
-std::string StatusUtils::statusCodeToString(StatusCode status, Language lang) {
-    const std::map<StatusCode, std::string>* descriptions = &englishStatusDescriptions;
-
-    if (lang == Language::GERMAN) {
-        descriptions = &germanStatusDescriptions;
+const std::map<StatusCode, std::string>& StatusUtils::getStatusDescriptions(Language lang) {
+    switch (lang) {
+        case Language::GERMAN:
+            return germanStatusDescriptions;
+        case Language::ENGLISH:
+        default:
+            return englishStatusDescriptions;
     }
+}
 
-    auto it = descriptions->find(status);
-    if (it != descriptions->end()) {
+std::string StatusUtils::statusCodeToString(StatusCode status) {
+    const std::map<StatusCode, std::string>& descriptions = getStatusDescriptions(currentLanguage);
+
+    auto it = descriptions.find(status);
+    if (it != descriptions.end()) {
         return it->second;
     }
     return "UNKNOWN STATUS";
