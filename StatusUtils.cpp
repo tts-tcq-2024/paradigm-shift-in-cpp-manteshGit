@@ -1,8 +1,6 @@
-#include "statusUtils.h"
-#include <map>
+#include "StatusUtils.h"
 #include <iostream>
 
-// Define translation maps for different languages
 const std::map<StatusCode, std::string> englishStatusDescriptions = {
     {NORMAL, "NORMAL"},
     {LOW_SOC_BREACH, "LOW_SOC_BREACH"},
@@ -29,13 +27,13 @@ const std::map<StatusCode, std::string> germanStatusDescriptions = {
     {CHARGE_RATE_OUT_OF_RANGE, "LADRATEN AUF DEM BEREICH"}
 };
 
-std::string statusCodeToString(StatusCode status, Language lang) {
+std::string StatusUtils::statusCodeToString(StatusCode status, Language lang) {
     const std::map<StatusCode, std::string>* descriptions = &englishStatusDescriptions;
-    
+
     if (lang == Language::GERMAN) {
         descriptions = &germanStatusDescriptions;
     }
-    
+
     auto it = descriptions->find(status);
     if (it != descriptions->end()) {
         return it->second;
@@ -43,7 +41,7 @@ std::string statusCodeToString(StatusCode status, Language lang) {
     return "UNKNOWN STATUS";
 }
 
-void printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus) {
+void StatusUtils::printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus) {
     std::cout << "SOC: " << soc << ", Temp: " << temp << ", Charge Rate: " << chargeRate
               << " -> SOC Status: " << statusCodeToString(socStatus)
               << ", Temp Status: " << statusCodeToString(tempStatus)
