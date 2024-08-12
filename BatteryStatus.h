@@ -6,8 +6,10 @@
 
 class BatteryStatus {
 public:
-    static std::tuple<StatusCode, StatusCode, StatusCode> getStatus(float soc, float temp, float chargeRate);
     static bool batteryIsOk(float soc, float temp, float chargeRate);
+
+private:
+    static std::tuple<StatusCode, StatusCode, StatusCode> getStatus(float soc, float temp, float chargeRate);
 };
 
 #endif // BATTERYSTATUS_H
