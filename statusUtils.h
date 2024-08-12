@@ -12,7 +12,6 @@ enum class Language {
     GERMAN
 };
 
-std::map<StatusCode, std::string> createStatusDescriptionMap();
 std::string statusCodeToString(StatusCode status, Language lang = Language::ENGLISH);
 void printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus);
 
