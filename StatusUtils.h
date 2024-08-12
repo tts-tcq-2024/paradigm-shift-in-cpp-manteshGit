@@ -12,8 +12,16 @@ enum class Language {
 
 class StatusUtils {
 public:
-    static std::string statusCodeToString(StatusCode status, Language lang = Language::ENGLISH);
+    static std::string statusCodeToString(StatusCode status);
     static void printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus);
+
+    static void setLanguage(Language lang) {
+        currentLanguage = lang;
+    }
+
+private:
+    static Language currentLanguage;
+    static const std::map<StatusCode, std::string>& getStatusDescriptions(Language lang = Language::ENGLISH);
 };
 
 #endif // STATUSUTILS_H
