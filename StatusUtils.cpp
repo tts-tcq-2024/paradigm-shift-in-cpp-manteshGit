@@ -4,55 +4,52 @@
 // Initialize the default language
 Language StatusUtils::currentLanguage = Language::ENGLISH;
 
-const std::map<StatusCode, std::string> englishStatusDescriptions = {
-    {NORMAL, "NORMAL"},
-    {LOW_SOC_BREACH, "LOW_SOC_BREACH"},
-    {LOW_SOC_WARNING, "LOW_SOC_WARNING: Approaching discharge"},
-    {HIGH_SOC_WARNING, "HIGH_SOC_WARNING: Approaching charge-peak"},
-    {HIGH_SOC_BREACH, "HIGH_SOC_BREACH"},
-    {SOC_OUT_OF_RANGE, "SOC_OUT_OF_RANGE"},
-    {TEMP_WARNING, "TEMP_WARNING: Approaching maximum temperature"},
-    {TEMP_OUT_OF_RANGE, "TEMP_OUT_OF_RANGE"},
-    {CHARGE_RATE_WARNING, "CHARGE_RATE_WARNING: Approaching maximum charge rate"},
-    {CHARGE_RATE_OUT_OF_RANGE, "CHARGE_RATE_OUT_OF_RANGE"}
-};
-
-const std::map<StatusCode, std::string> germanStatusDescriptions = {
-    {NORMAL, "NORMAL"},
-    {LOW_SOC_BREACH, "NIEDRIGER SOC ÜBERSCHREITUNG"},
-    {LOW_SOC_WARNING, "NIEDRIGER SOC WARNUNG: Näher am Entladen"},
-    {HIGH_SOC_WARNING, "HOHER SOC WARNUNG: Näher am Ladepeak"},
-    {HIGH_SOC_BREACH, "HOHER SOC ÜBERSCHREITUNG"},
-    {SOC_OUT_OF_RANGE, "SOC AUF DEM BEREICH"},
-    {TEMP_WARNING, "TEMPERATURWARNUNG: Näher an der maximalen Temperatur"},
-    {TEMP_OUT_OF_RANGE, "TEMPERATUR AUF DEM BEREICH"},
-    {CHARGE_RATE_WARNING, "LADRATENWARNUNG: Näher an der maximalen Ladegeschwindigkeit"},
-    {CHARGE_RATE_OUT_OF_RANGE, "LADRATEN AUF DEM BEREICH"}
-};
-
-const std::map<StatusCode, std::string>& StatusUtils::getStatusDescriptions(Language lang) {
-    switch (lang) {
-        case Language::GERMAN:
-            return germanStatusDescriptions;
-        case Language::ENGLISH:
-        default:
-            return englishStatusDescriptions;
+// Multidimensional vector to hold descriptions for each status code and language
+const std::vector<std::vector<std::string>> statusDescriptions = {
+    // English descriptions
+    {
+        "NORMAL",
+        "LOW_SOC_BREACH",
+        "LOW_SOC_WARNING: Approaching discharge",
+        "HIGH_SOC_WARNING: Approaching charge-peak",
+        "HIGH_SOC_BREACH",
+        "SOC_OUT_OF_RANGE",
+        "TEMP_WARNING: Approaching maximum temperature",
+        "TEMP_OUT_OF_RANGE",
+        "CHARGE_RATE_WARNING: Approaching maximum charge rate",
+        "CHARGE_RATE_OUT_OF_RANGE"
+    },
+    // German descriptions
+    {
+        "NORMAL",
+        "NIEDRIGER SOC ÜBERSCHREITUNG",
+        "NIEDRIGER SOC WARNUNG: Näher am Entladen",
+        "HOHER SOC WARNUNG: Näher am Ladepeak",
+        "HOHER SOC ÜBERSCHREITUNG",
+        "SOC AUF DEM BEREICH",
+        "TEMPERATURWARNUNG: Näher an der maximalen Temperatur",
+        "TEMPERATUR AUF DEM BEREICH",
+        "LADRATENWARNUNG: Näher an der maximalen Ladegeschwindigkeit",
+        "LADRATEN AUF DEM BEREICH"
     }
+};
+
+const std::vector<std::vector<std::string>>& StatusUtils::getStatusDescriptions() {
+    return statusDescriptions;
 }
 
-std::string StatusUtils::statusCodeToString(StatusCode status) {
-    const std::map<StatusCode, std::string>& descriptions = getStatusDescriptions(currentLanguage);
+std::string StatusUtils::statusCodeToString(StatusCode status, Language lang) {
+    const std::vector<std::string>& descriptions = getStatusDescriptions()[static_cast<int>(lang)];
 
-    auto it = descriptions.find(status);
-    if (it != descriptions.end()) {
-        return it->second;
+    if (status >= 0 && status < descriptions.size()) {
+        return descriptions[status];
     }
     return "UNKNOWN STATUS";
 }
 
-void StatusUtils::printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus) {
+void StatusUtils::printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus, Language lang) {
     std::cout << "SOC: " << soc << ", Temp: " << temp << ", Charge Rate: " << chargeRate
-              << " -> SOC Status: " << statusCodeToString(socStatus)
-              << ", Temp Status: " << statusCodeToString(tempStatus)
-              << ", Charge Rate Status: " << statusCodeToString(chargeRateStatus) << std::endl;
+              << " -> SOC Status: " << statusCodeToString(socStatus, lang)
+              << ", Temp Status: " << statusCodeToString(tempStatus, lang)
+              << ", Charge Rate Status: " << statusCodeToString(chargeRateStatus, lang) << std::endl;
 }
