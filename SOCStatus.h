@@ -3,7 +3,7 @@
 
 #include "StatusCodes.h"  // Include for StatusCode enum
 
-class SOCStatus {
+class SOCStatus : public StatusCodes {
 private:
     // SOC related constants
     static constexpr float SOC_MIN = 20.0f;
@@ -11,6 +11,9 @@ private:
     static constexpr float SOC_WARNING_MAX_TOLERANCE = 0.05f * SOC_MAX;
     static constexpr float SOC_WARNING_MIN_TOLERANCE = 0.05f * SOC_MAX;
 public:
+
+    SOCStatus(bool enableWarnings = true);
+    
     StatusCode checkSOCWarnings(float soc) const;
     StatusCode checkSOCBounds(float soc) const;
     StatusCode getSOCStatus(float soc) const;
