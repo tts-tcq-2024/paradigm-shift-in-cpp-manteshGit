@@ -5,6 +5,7 @@ std::tuple<StatusCode, StatusCode, StatusCode> BatteryStatus::getStatus(float so
     SOCStatus mSoc;
     TemperatureStatus mTemperature;
     ChargeRateStatus mCharge;
+    
     StatusCode socStatus = mSoc.getSOCStatus(soc);
     StatusCode tempStatus = mTemperature.getTemperatureStatus(temp);
     StatusCode chargeRateStatus = mCharge.getChargeRateStatus(chargeRate);
