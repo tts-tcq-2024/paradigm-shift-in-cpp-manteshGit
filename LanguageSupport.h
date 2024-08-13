@@ -10,7 +10,7 @@ enum class Language {
     GERMAN
 };
 
-class StatusUtils {
+class LanguageSupport {
 public:
     static std::string statusCodeToString(StatusCode status, Language lang = Language::ENGLISH);
     static void printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus, Language lang = Language::ENGLISH);
