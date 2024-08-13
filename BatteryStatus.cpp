@@ -1,11 +1,13 @@
 #include "BatteryStatus.h"
-#include "StatusUtils.h"
+#include "LanguageSupport.h"
 
 std::tuple<StatusCode, StatusCode, StatusCode> BatteryStatus::getStatus(float soc, float temp, float chargeRate) {
-    Status status;
-    StatusCode socStatus = status.getSOCStatus(soc);
-    StatusCode tempStatus = status.getTemperatureStatus(temp);
-    StatusCode chargeRateStatus = status.getChargeRateStatus(chargeRate);
+    SOCStatus mSoc;
+    TemperatureStatus mTemperature;
+    ChargeRateStatus mCharge;
+    StatusCode socStatus = mSoc.getSOCStatus(soc);
+    StatusCode tempStatus = mTemperature.getTemperatureStatus(temp);
+    StatusCode chargeRateStatus = mCharge.getChargeRateStatus(chargeRate);
 
     return std::make_tuple(socStatus, tempStatus, chargeRateStatus);
 }
@@ -16,7 +18,7 @@ bool BatteryStatus::batteryIsOk(float soc, float temp, float chargeRate) {
     StatusCode tempStatus = std::get<1>(status);
     StatusCode chargeRateStatus = std::get<2>(status);
 
-    StatusUtils::printStatus(soc, temp, chargeRate, socStatus, tempStatus, chargeRateStatus);
+    LanguageSupport::printStatus(soc, temp, chargeRate, socStatus, tempStatus, chargeRateStatus);
 
     return (socStatus == NORMAL && tempStatus == NORMAL && chargeRateStatus == NORMAL);
 }
