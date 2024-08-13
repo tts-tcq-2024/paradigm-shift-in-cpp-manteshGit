@@ -1,7 +1,13 @@
 #include "TemperatureStatus.h"
 
+TemperatureStatus::TemperatureStatus(bool enableWarnings) {
+    setWarningsEnabled(enableWarnings); // Initialize warningsEnabled
+}
+
 StatusCode TemperatureStatus::checkTemperatureWarnings(float temp) const {
-    if (temp > TEMP_MAX - TEMP_WARNING_TOLERANCE) {
+    if (!areWarningsEnabled()) return NORMAL;
+    
+    if ((temp > TEMP_MAX - TEMP_WARNING_TOLERANCE) and temp <= TEMP_MAX) {
         return TEMP_WARNING;
     }
     return NORMAL;
