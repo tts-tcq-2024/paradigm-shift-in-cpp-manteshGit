@@ -52,6 +52,11 @@ Can we add new functionality without disturbing the old?
 
 ## Keep it Simple
 
+## Implemeted the below extensions
+Extension 1: Early Warning
+Extension 2: Support a language in addition to English
+
+
 Shorten the Semantic distance
 
 - Procedural to express sequence
