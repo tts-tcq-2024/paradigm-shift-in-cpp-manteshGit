@@ -2,6 +2,9 @@
 #define BATTERYSTATUS_H
 
 #include "StatusCodes.h"
+#include "SOCStatus.h"
+#include "TemperatureStatus.h"
+#include "ChargeRateStatus.h"
 #include <tuple>
 
 namespace BatteryStatus {
