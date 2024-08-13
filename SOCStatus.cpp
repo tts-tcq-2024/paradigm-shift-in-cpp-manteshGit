@@ -1,6 +1,12 @@
 #include "SOCStatus.h"
 
+SOCStatus::SOCStatus(bool enableWarnings) {
+    setWarningsEnabled(enableWarnings); // Initialize warningsEnabled
+}
+
 StatusCode SOCStatus::checkSOCWarnings(float soc) const {
+    if (!areWarningsEnabled()) return NORMAL;
+    
     if ((soc < SOC_MIN + SOC_WARNING_MIN_TOLERANCE) and soc >= SOC_MIN) {
         return LOW_SOC_WARNING;
     } else if ((soc > (SOC_MAX - SOC_WARNING_MAX_TOLERANCE)) and soc <= SOC_MAX) {
