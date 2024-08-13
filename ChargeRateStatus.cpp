@@ -1,7 +1,13 @@
 #include "ChargeRateStatus.h"
 
+ChargeRateStatus::ChargeRateStatus(bool enableWarnings) {
+    setWarningsEnabled(enableWarnings); // Initialize warningsEnabled
+}
+
 StatusCode ChargeRateStatus::checkChargeRateWarnings(float chargeRate) const {
-    if (chargeRate > CHARGE_RATE_MAX - CHARGE_RATE_WARNING_TOLERANCE) {
+    if (!areWarningsEnabled()) return NORMAL;
+    
+    if ((chargeRate >= CHARGE_RATE_MAX - CHARGE_RATE_WARNING_TOLERANCE) and chargeRate <= CHARGE_RATE_MAX) {
         return CHARGE_RATE_WARNING;
     }
     return NORMAL;
