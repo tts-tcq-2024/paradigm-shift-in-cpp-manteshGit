@@ -5,11 +5,9 @@ SOCStatus::SOCStatus(bool enableWarnings) {
 }
 
 StatusCode SOCStatus::checkSOCWarnings(float soc) const {
-    if (!areWarningsEnabled()) return NORMAL;
-    
-    if ((soc < SOC_MIN + SOC_WARNING_MIN_TOLERANCE) and soc >= SOC_MIN) {
+    if ((soc < SOC_MIN + SOC_WARNING_MIN_TOLERANCE) and soc >= SOC_MIN and areWarningsEnabled()) {
         return LOW_SOC_WARNING;
-    } else if ((soc > (SOC_MAX - SOC_WARNING_MAX_TOLERANCE)) and soc <= SOC_MAX) {
+    } else if ((soc > (SOC_MAX - SOC_WARNING_MAX_TOLERANCE)) and soc <= SOC_MAX and areWarningsEnabled()) {
         return HIGH_SOC_WARNING;
     }
     return NORMAL;
