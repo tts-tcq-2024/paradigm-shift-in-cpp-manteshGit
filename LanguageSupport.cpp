@@ -1,8 +1,8 @@
-#include "StatusUtils.h"
+#include "LanguageSupport.h"
 #include <iostream>
 
 // Initialize the default language
-Language StatusUtils::currentLanguage = Language::ENGLISH;
+Language LanguageSupport::currentLanguage = Language::ENGLISH;
 
 // Multidimensional vector to hold descriptions for each status code and language
 const std::vector<std::vector<std::string>> statusDescriptions = {
@@ -34,11 +34,11 @@ const std::vector<std::vector<std::string>> statusDescriptions = {
     }
 };
 
-const std::vector<std::vector<std::string>>& StatusUtils::getStatusDescriptions() {
+const std::vector<std::vector<std::string>>& LanguageSupport::getStatusDescriptions() {
     return statusDescriptions;
 }
 
-std::string StatusUtils::statusCodeToString(StatusCode status, Language lang) {
+std::string LanguageSupport::statusCodeToString(StatusCode status, Language lang) {
     const std::vector<std::string>& descriptions = getStatusDescriptions()[static_cast<int>(lang)];
 
     if (status >= 0 && status < descriptions.size()) {
@@ -47,7 +47,7 @@ std::string StatusUtils::statusCodeToString(StatusCode status, Language lang) {
     return "UNKNOWN STATUS";
 }
 
-void StatusUtils::printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus, Language lang) {
+void LanguageSupport::printStatus(float soc, float temp, float chargeRate, StatusCode socStatus, StatusCode tempStatus, StatusCode chargeRateStatus, Language lang) {
     std::cout << "SOC: " << soc << ", Temp: " << temp << ", Charge Rate: " << chargeRate
               << " -> SOC Status: " << statusCodeToString(socStatus, lang)
               << ", Temp Status: " << statusCodeToString(tempStatus, lang)
